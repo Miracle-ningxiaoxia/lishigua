@@ -1,14 +1,12 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
-import LoadingScreen from './LoadingScreen'
+import { useRef } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import InfiniteMoments from './InfiniteMoments'
 import Noise from '../ui/Noise'
 import { ArrowDown } from 'lucide-react'
 
 export default function Hero() {
-  const [isLoading, setIsLoading] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
   
   // Use window scroll instead of target to avoid Lenis conflict
@@ -24,18 +22,12 @@ export default function Hero() {
   
   return (
     <section ref={containerRef} className="relative h-screen w-full overflow-hidden bg-black">
-      <AnimatePresence mode="wait">
-        {isLoading && (
-          <LoadingScreen key="loading-screen" onComplete={() => setIsLoading(false)} />
-        )}
-      </AnimatePresence>
-
       {/* Background Layer */}
       <motion.div 
         className="absolute inset-0 z-0"
         style={{ scale, filter: blur }}
-        initial={{ scale: 1.5 }} // Start zoomed in
-        animate={{ scale: isLoading ? 1.5 : 1 }} // Zoom out to 1 when loading finishes
+        initial={{ scale: 1.2, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 2, ease: "easeOut" }}
       >
         <video 
@@ -61,9 +53,8 @@ export default function Hero() {
 
       <Noise />
 
-      {/* Content Layer - Only visible after loading (or animate in) */}
-      {!isLoading && (
-        <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
+      {/* Content Layer */}
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -114,7 +105,6 @@ export default function Hero() {
               <ArrowDown className="h-4 w-4" />
             </motion.div>
         </div>
-      )}
     </section>
   )
 }

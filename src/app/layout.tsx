@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Dancing_Script } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/ui/CustomCursor";
-import MusicPlayer from "@/components/ui/MusicPlayer";
+import AppWrapper from "@/components/AppWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,10 +36,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${dancingScript.variable} antialiased bg-black text-[#ededed]`}
       >
         <CustomCursor />
-        <MusicPlayer />
-        <SmoothScroll>
-          {children}
-        </SmoothScroll>
+        <AppWrapper>
+          <SmoothScroll>
+            {children}
+          </SmoothScroll>
+        </AppWrapper>
       </body>
     </html>
   );

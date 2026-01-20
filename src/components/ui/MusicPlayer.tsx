@@ -1,10 +1,14 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react'
 import { Play } from 'lucide-react'
 
-export default function MusicPlayer() {
+export interface MusicPlayerRef {
+  startMusic: () => Promise<void>
+}
+
+const MusicPlayer = forwardRef<MusicPlayerRef>((props, ref) => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isReady, setIsReady] = useState(false)
@@ -49,31 +53,26 @@ export default function MusicPlayer() {
     }
   }, [])
 
-  // Autoplay after setup
-  useEffect(() => {
-    if (!isReady || !audioRef.current || !audioContextRef.current) return
+  // Expose startMusic method to parent
+  useImperativeHandle(ref, () => ({
+    startMusic: async () => {
+      if (!audioRef.current || !audioContextRef.current) return
 
-    const attemptAutoplay = async () => {
       try {
         // Resume audio context if suspended
-        if (audioContextRef.current!.state === 'suspended') {
-          await audioContextRef.current!.resume()
+        if (audioContextRef.current.state === 'suspended') {
+          await audioContextRef.current.resume()
         }
         
-        // Attempt to play
-        await audioRef.current!.play()
+        // Play and fade in
+        await audioRef.current.play()
         fadeAudio(0.5, 2) // Fade in over 2 seconds
         setIsPlaying(true)
       } catch (error) {
-        console.log('Autoplay blocked by browser, user interaction required')
+        console.log('Audio playback failed:', error)
       }
     }
-
-    // Delay to ensure page is loaded
-    const timer = setTimeout(attemptAutoplay, 1500)
-
-    return () => clearTimeout(timer)
-  }, [isReady, fadeAudio])
+  }))
 
   const togglePlay = async () => {
     if (!audioRef.current) return
@@ -188,4 +187,8 @@ export default function MusicPlayer() {
       </motion.div>
     </>
   )
-}
+})
+
+MusicPlayer.displayName = 'MusicPlayer'
+
+export default MusicPlayer

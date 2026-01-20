@@ -1,0 +1,300 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Image from 'next/image'
+
+// Register GSAP plugins
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger)
+}
+
+interface Member {
+  id: string
+  name: string
+  nickname: string
+  quote: string
+  code: string
+  image: string
+}
+
+const members: Member[] = [
+  {
+    id: 'member-1',
+    name: '陈果子',
+    nickname: '少爷',
+    quote: '王睿娃又在躲酒！！！',
+    code: 'chenguozi',
+    image: '/images/crew/intro/cgz.jpg'
+  },
+  {
+    id: 'member-2',
+    name: '范大爷',
+    nickname: '饭大爷',
+    quote: '现役武警！哪个躲酒抓哪个',
+    code: 'fandaye',
+    image: '/images/crew/intro/fk.jpg'
+  },
+  {
+    id: 'member-3',
+    name: '范小车',
+    nickname: '睡王',
+    quote: '等一哈倒酒，我先睡哈多',
+    code: 'fanxiaoche',
+    image: '/images/crew/intro/fxj.jpg'
+  },
+  {
+    id: 'member-4',
+    name: '蓉姐',
+    nickname: '豆豆',
+    quote: '陈登睿是瓜皮',
+    code: 'rongjie',
+    image: '/images/crew/intro/ljr.jpg'
+  },
+  {
+    id: 'member-5',
+    name: '李果子',
+    nickname: '李事瓜 ',
+    quote: '我这人没别的优点，就是能喝',
+    code: 'liguozi',
+    image: '/images/crew/intro/lqw.jpg'
+  },
+  {
+    id: 'member-6',
+    name: '王睿娃',
+    nickname: '吐王 ',
+    quote: '全市的ktv洗手池我李睿承包了！',
+    code: 'wangruiwa',
+    image: '/images/crew/intro/lr.jpg'
+  },
+  {
+    id: 'member-7',
+    name: '小霞',
+    nickname: '宁老师 ',
+    quote: '我作证，王睿是吐王',
+    code: 'xiaoxia',
+    image: '/images/crew/intro/nxx.jpg'
+  },
+  {
+    id: 'member-8',
+    name: '邱雪晶',
+    nickname: '小邱 ',
+    quote: '李清文最帅',
+    code: 'qiuxuejing',
+    image: '/images/crew/intro/qxj.jpg'
+  },
+  {
+    id: 'member-9',
+    name: '王燕',
+    nickname: '王燕 ',
+    quote: '你们就说我烤的烧烤好吃不',
+    code: 'wangyan',
+    image: '/images/crew/intro/sdx.jpg'
+  },
+  {
+    id: 'member-10',
+    name: '舒兴友',
+    nickname: '舒老板 ',
+    quote: '请叫我露营大王！',
+    code: 'shuxingyou',
+    image: '/images/crew/intro/sxy.jpg'
+  },
+  {
+    id: 'member-11',
+    name: '唐蛋',
+    nickname: '蛋蛋 ',
+    quote: '恕我直言，在座的各位都是垃圾',
+    code: 'tangdan',
+    image: '/images/crew/intro/trd.jpg'
+  },
+  {
+    id: 'member-12',
+    name: '王老师',
+    nickname: '王老师 ',
+    quote: '你们真的是我带的最差的一届',
+    code: 'wanglaoshi',
+    image: '/images/crew/intro/wls.jpg'
+  },
+  {
+    id: 'member-13',
+    name: '佳姐',
+    nickname: '佳姐 ',
+    quote: '把唐蛋喝翻再来找我喝酒哈',
+    code: 'jiajie',
+    image: '/images/crew/intro/zyj.jpg'
+  },
+  {
+    id: 'member-14',
+    name: '袁老师',
+    nickname: '袁老师 ',
+    quote: '大家好，我是袁老师，我教范小车怎么喝酒不睡觉',
+    code: 'yuanlaoshi',
+    image: '/images/crew/intro/fxjdx.jpg'
+  },
+]
+
+interface MemberShowcaseProps {
+  onComplete: () => void
+}
+
+export default function MemberShowcase({ onComplete }: MemberShowcaseProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const cardsRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!containerRef.current || !cardsRef.current) return
+
+    const container = containerRef.current
+    const cards = cardsRef.current
+
+    // Calculate total scroll distance
+    const totalWidth = cards.scrollWidth
+    const viewportWidth = window.innerWidth
+
+    // Create horizontal scroll animation
+    const scrollTween = gsap.to(cards, {
+      x: -(totalWidth - viewportWidth),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: container,
+        pin: true,
+        scrub: 1,
+        end: () => `+=${totalWidth}`,
+        onLeave: () => {
+          // When scroll ends, trigger completion
+          setTimeout(() => {
+            onComplete()
+          }, 500)
+        },
+      },
+    })
+
+    return () => {
+      scrollTween.kill()
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+    }
+  }, [onComplete])
+
+  return (
+    <div ref={containerRef} className="relative h-screen w-full bg-black overflow-hidden">
+      {/* Horizontal cards container */}
+      <div
+        ref={cardsRef}
+        className="flex h-full items-center"
+        style={{ width: `${members.length * 100}vw` }}
+      >
+        {members.map((member, index) => (
+          <div
+            key={member.id}
+            className="relative w-screen h-full flex items-center justify-center px-16"
+          >
+            {/* Background code text */}
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              initial={{ opacity: 0, scale: 0.8, filter: 'blur(20px)' }}
+              whileInView={{ opacity: 0.05, scale: 1, filter: 'blur(0px)' }}
+              transition={{ duration: 1, delay: 0.3 }}
+              viewport={{ once: false, amount: 0.5 }}
+            >
+              <p className="text-[20vw] font-bold text-white">
+                {member.code}
+              </p>
+            </motion.div>
+
+            {/* Card content */}
+            <motion.div
+              className="relative z-10 max-w-5xl w-full flex flex-col md:flex-row items-center gap-12"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: false, amount: 0.5 }}
+            >
+              {/* Image */}
+              <div className="w-full md:w-1/2 aspect-[3/4] rounded-3xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 relative">
+                <Image 
+                  src={member.image} 
+                  alt={member.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority={index < 3}
+                />
+                {/* Gradient overlay for better text readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+              </div>
+
+              {/* Info */}
+              <div className="w-full md:w-1/2 space-y-6">
+                <div>
+                  <h2 className="text-5xl md:text-6xl font-bold text-white mb-2">
+                    {member.name}
+                  </h2>
+                  <p className="font-hand text-2xl text-white/50">
+                    {member.nickname}
+                  </p>
+                </div>
+
+                <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6">
+                  <p className="font-hand text-xl md:text-2xl text-white/90 leading-relaxed">
+                    &ldquo;{member.quote}&rdquo;
+                  </p>
+                </div>
+
+                {/* Progress indicator */}
+                <div className="flex items-center gap-2 pt-4">
+                  {members.map((_, i) => (
+                    <div
+                      key={i}
+                      className={`h-1 rounded-full transition-all duration-300 ${
+                        i === index ? 'w-12 bg-white/60' : 'w-8 bg-white/20'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        ))}
+
+        {/* Final slide - transition indicator */}
+        <div className="relative w-screen h-full flex items-center justify-center px-16">
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: false, amount: 0.5 }}
+          >
+            <p className="text-5xl md:text-7xl font-bold text-white mb-4">
+              这就是我们
+            </p>
+            <p className="font-mono text-sm text-white/40 uppercase tracking-[0.3em]">
+              继续向下滚动
+            </p>
+            <motion.div
+              className="mt-8"
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <span className="text-4xl">⬇️</span>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Scroll hint (bottom) */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1 }}
+      >
+        <p className="font-mono text-xs text-white/30 uppercase tracking-[0.3em]">
+          滚动查看更多
+        </p>
+      </motion.div>
+    </div>
+  )
+}
