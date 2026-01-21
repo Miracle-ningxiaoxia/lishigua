@@ -2,18 +2,17 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import IntroBubble from './IntroBubble'
+import IntroTitle from './IntroTitle'
 import MemberShowcase from './MemberShowcase'
 
 interface IntroOrchestratorProps {
-  onComplete: () => void
   onMusicStart: () => void
 }
 
-export default function IntroOrchestrator({ onComplete, onMusicStart }: IntroOrchestratorProps) {
-  const [stage, setStage] = useState<'bubble' | 'showcase' | 'complete'>('bubble')
+export default function IntroOrchestrator({ onMusicStart }: IntroOrchestratorProps) {
+  const [stage, setStage] = useState<'title' | 'showcase'>('title')
 
-  const handleBubbleExplode = () => {
+  const handleEnter = () => {
     // Start music
     onMusicStart()
     
@@ -23,23 +22,10 @@ export default function IntroOrchestrator({ onComplete, onMusicStart }: IntroOrc
     }, 100)
   }
 
-  const handleShowcaseComplete = () => {
-    setStage('complete')
-    
-    // Notify parent that intro is complete
-    setTimeout(() => {
-      onComplete()
-    }, 800)
-  }
-
-  if (stage === 'complete') {
-    return null
-  }
-
   return (
     <AnimatePresence mode="wait">
-      {stage === 'bubble' && (
-        <IntroBubble key="bubble" onExplode={handleBubbleExplode} />
+      {stage === 'title' && (
+        <IntroTitle key="title" onEnter={handleEnter} />
       )}
       
       {stage === 'showcase' && (
@@ -47,10 +33,10 @@ export default function IntroOrchestrator({ onComplete, onMusicStart }: IntroOrc
           key="showcase"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, y: -100 }}
-          transition={{ duration: 0.8 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5, ease: 'easeInOut' }}
         >
-          <MemberShowcase onComplete={handleShowcaseComplete} />
+          <MemberShowcase />
         </motion.div>
       )}
     </AnimatePresence>

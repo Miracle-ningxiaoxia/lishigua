@@ -3,7 +3,8 @@ import { Geist, Geist_Mono, Dancing_Script } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/ui/CustomCursor";
-import AppWrapper from "@/components/AppWrapper";
+import Navigation from "@/components/ui/Navigation";
+import AppProvider from "@/components/providers/AppProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,8 +22,8 @@ const dancingScript = Dancing_Script({
 });
 
 export const metadata: Metadata = {
-  title: "友谊纪念馆",
-  description: "友谊纪念馆 - 记录我们珍贵回忆的数字避风港",
+  title: "李事瓜粉丝后援团",
+  description: "拾光纪 - 记录我们珍贵回忆的数字避风港",
 };
 
 export default function RootLayout({
@@ -36,11 +37,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${dancingScript.variable} antialiased bg-black text-[#ededed]`}
       >
         <CustomCursor />
-        <AppWrapper>
+        <AppProvider>
+          <Navigation />
           <SmoothScroll>
             {children}
           </SmoothScroll>
-        </AppWrapper>
+        </AppProvider>
       </body>
     </html>
   );

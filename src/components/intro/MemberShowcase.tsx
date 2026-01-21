@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 import Image from 'next/image'
 
 // Register GSAP plugins
 if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger)
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
 }
 
 interface Member {
@@ -135,11 +136,7 @@ const members: Member[] = [
   },
 ]
 
-interface MemberShowcaseProps {
-  onComplete: () => void
-}
-
-export default function MemberShowcase({ onComplete }: MemberShowcaseProps) {
+export default function MemberShowcase() {
   const containerRef = useRef<HTMLDivElement>(null)
   const cardsRef = useRef<HTMLDivElement>(null)
 
@@ -152,22 +149,27 @@ export default function MemberShowcase({ onComplete }: MemberShowcaseProps) {
     // Calculate total scroll distance
     const totalWidth = cards.scrollWidth
     const viewportWidth = window.innerWidth
+    const scrollDistance = totalWidth - viewportWidth
 
-    // Create horizontal scroll animation
+    // Create horizontal scroll animation with optimized settings
     const scrollTween = gsap.to(cards, {
-      x: -(totalWidth - viewportWidth),
+      x: -scrollDistance,
       ease: 'none',
       scrollTrigger: {
         trigger: container,
         pin: true,
+        pinSpacing: true,
         scrub: 1,
-        end: () => `+=${totalWidth}`,
-        onLeave: () => {
-          // When scroll ends, trigger completion
-          setTimeout(() => {
-            onComplete()
-          }, 500)
-        },
+        anticipatePin: 1,
+        // Bind end point to the actual scroll distance needed
+        end: () => `+=${scrollDistance + viewportWidth * 0.5}`,
+        // Snap to key positions for precise alignment
+        snap: {
+          snapTo: [0, 0.2, 0.4, 0.6, 0.8, 1], // Snap points for each section
+          duration: { min: 0.2, max: 0.4 },
+          delay: 0,
+          ease: 'power1.inOut'
+        }
       },
     })
 
@@ -175,7 +177,7 @@ export default function MemberShowcase({ onComplete }: MemberShowcaseProps) {
       scrollTween.kill()
       ScrollTrigger.getAll().forEach(trigger => trigger.kill())
     }
-  }, [onComplete])
+  }, [])
 
   return (
     <div ref={containerRef} className="relative h-screen w-full bg-black overflow-hidden">
@@ -257,31 +259,6 @@ export default function MemberShowcase({ onComplete }: MemberShowcaseProps) {
             </motion.div>
           </div>
         ))}
-
-        {/* Final slide - transition indicator */}
-        <div className="relative w-screen h-full flex items-center justify-center px-16">
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: false, amount: 0.5 }}
-          >
-            <p className="text-5xl md:text-7xl font-bold text-white mb-4">
-              这就是我们
-            </p>
-            <p className="font-mono text-sm text-white/40 uppercase tracking-[0.3em]">
-              继续向下滚动
-            </p>
-            <motion.div
-              className="mt-8"
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              <span className="text-4xl">⬇️</span>
-            </motion.div>
-          </motion.div>
-        </div>
       </div>
 
       {/* Scroll hint (bottom) */}

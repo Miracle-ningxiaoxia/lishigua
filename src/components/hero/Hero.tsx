@@ -21,10 +21,15 @@ export default function Hero() {
   const title = "ECHOES | 拾光纪"
   
   return (
-    <section ref={containerRef} className="relative h-screen w-full overflow-hidden bg-black">
+    <section 
+      ref={containerRef} 
+      id="home-section"
+      className="relative min-h-[100vh] h-screen w-full overflow-hidden bg-black"
+      style={{ marginTop: 0, paddingTop: 0 }}
+    >
       {/* Background Layer */}
       <motion.div 
-        className="absolute inset-0 z-0"
+        className="absolute inset-0 z-0 overflow-hidden"
         style={{ scale, filter: blur }}
         initial={{ scale: 1.2, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -35,7 +40,8 @@ export default function Hero() {
           loop 
           muted 
           playsInline
-          className="h-full w-full object-cover"
+          className="absolute top-0 left-0 h-[100vh] w-full object-cover"
+          style={{ minHeight: '100vh', minWidth: '100vw' }}
         >
           {/* 请确保将您的视频文件命名为 hero-bg.mp4 并放入 public 文件夹 */}
           <source src="/hero-bg.mp4" type="video/mp4" />

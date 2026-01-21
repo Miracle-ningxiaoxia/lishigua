@@ -1,68 +1,91 @@
 'use client'
 
-import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from 'react'
+import Masonry from 'react-masonry-css'
 import CrewCard from './CrewCard'
-
-// Crew data structure
-export interface CrewMember {
-  id: string
-  name: string
-  nickname: string
-  role: string
-  quote: string
-  avatarUrl: string
-  color: string
-}
-
-const crewData: CrewMember[] = [
-  {
-    id: 'crew-1',
-    name: 'Alex',
-    nickname: 'The Visionary',
-    role: '氛围担当',
-    quote: '生活不只是活着，而是创造值得被铭记的瞬间。',
-    avatarUrl: '/images/crew/alex.jpg',
-    color: '#f43f5e', // rose-500
-  },
-  {
-    id: 'crew-2',
-    name: 'Jordan',
-    nickname: 'The Architect',
-    role: '技术顾问',
-    quote: '每一行代码都是通往未来的桥梁，我们一起搭建。',
-    avatarUrl: '/images/crew/jordan.jpg',
-    color: '#0ea5e9', // sky-500
-  },
-  {
-    id: 'crew-3',
-    name: 'Sam',
-    nickname: 'The Storyteller',
-    role: '灵魂写手',
-    quote: '故事不会结束，它们只是在等待下一个讲述者。',
-    avatarUrl: '/images/crew/sam.jpg',
-    color: '#8b5cf6', // violet-500
-  },
-  {
-    id: 'crew-4',
-    name: 'Taylor',
-    nickname: 'The Dreamer',
-    role: '创意策划',
-    quote: '梦想很贵，但我们的友谊让它变得触手可及。',
-    avatarUrl: '/images/crew/taylor.jpg',
-    color: '#f59e0b', // amber-500
-  },
-]
+import CoupleCard from './CoupleCard'
+import { crewMembers, couplesData, findCoupleByMembers } from './crewData'
 
 export default function Crew() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+  const [activatedMembers, setActivatedMembers] = useState<Set<string>>(new Set())
+  const [mergedCouple, setMergedCouple] = useState<string | null>(null)
 
   const isAnyHovered = hoveredIndex !== null
+
+  // Masonry breakpoints
+  const breakpointColumns = {
+    default: 4,  // Desktop: 4 columns
+    1024: 3,     // Tablet: 3 columns
+    768: 2,      // Mobile: 2 columns
+    480: 1       // Small: 1 column
+  }
+
+  // Handle member click/activation
+  const handleMemberClick = (memberId: string) => {
+    const newActivated = new Set(activatedMembers)
+    
+    if (newActivated.has(memberId)) {
+      // Deactivate if already activated
+      newActivated.delete(memberId)
+    } else {
+      // Activate the member
+      newActivated.add(memberId)
+      
+      // Check if both partners are now activated
+      const member = crewMembers.find(m => m.id === memberId)
+      if (member?.partnerId && newActivated.has(member.partnerId)) {
+        // Both partners activated - trigger merge!
+        const couple = findCoupleByMembers(memberId, member.partnerId)
+        if (couple) {
+          setMergedCouple(couple.id)
+          // Clear activated members
+          newActivated.clear()
+        }
+      }
+    }
+    
+    setActivatedMembers(newActivated)
+  }
+
+  // Close couple card
+  const handleCloseCoupleCard = () => {
+    setMergedCouple(null)
+    setActivatedMembers(new Set())
+  }
+
+  // Get merged couple data
+  const activeCoupleData = mergedCouple 
+    ? couplesData.find(c => c.id === mergedCouple)
+    : null
+
+  const activeCouple = activeCoupleData ? {
+    couple: activeCoupleData,
+    partner1: crewMembers.find(m => m.id === activeCoupleData.partner1Id)!,
+    partner2: crewMembers.find(m => m.id === activeCoupleData.partner2Id)!,
+  } : null
 
   return (
     <section className="relative min-h-screen w-full bg-black py-32 md:py-40 overflow-hidden">
       {/* Gradient transition */}
       <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-black via-black/50 to-transparent pointer-events-none" />
+
+      {/* Dynamic background color when couple is active */}
+      <AnimatePresence>
+        {activeCoupleData && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: `radial-gradient(circle at center, ${activeCoupleData.accentColor}15 0%, transparent 70%)`,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+          />
+        )}
+      </AnimatePresence>
 
       <div className="container mx-auto px-4 md:px-8 relative">
         {/* Section Title */}
@@ -81,19 +104,113 @@ export default function Crew() {
           </p>
         </motion.div>
 
-        {/* Cards Grid */}
-        <div className="flex flex-wrap justify-center gap-8 md:gap-12">
-          {crewData.map((member, index) => (
-            <CrewCard
-              key={member.id}
-              member={member}
-              index={index}
-              isAnyHovered={isAnyHovered}
-              onHoverStart={() => setHoveredIndex(index)}
-              onHoverEnd={() => setHoveredIndex(null)}
-            />
-          ))}
-        </div>
+        {/* Hint text */}
+        <motion.p
+          className="text-center mb-12 font-mono text-sm text-white/40"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          💡 选择两位铠甲勇士，合体！
+        </motion.p>
+
+        {/* True Masonry Layout */}
+        <AnimatePresence mode="wait">
+          {!mergedCouple && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Masonry
+                breakpointCols={breakpointColumns}
+                className="crew-masonry-grid"
+                columnClassName="crew-masonry-column"
+              >
+                {crewMembers.map((member, index) => (
+                  <CrewCard
+                    key={member.id}
+                    member={member}
+                    index={index}
+                    isAnyHovered={isAnyHovered}
+                    isActivated={activatedMembers.has(member.id)}
+                    onHoverStart={() => setHoveredIndex(index)}
+                    onHoverEnd={() => setHoveredIndex(null)}
+                    onClick={() => handleMemberClick(member.id)}
+                  />
+                ))}
+              </Masonry>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Masonry Styles */}
+        <style jsx global>{`
+          .crew-masonry-grid {
+            display: flex;
+            margin: 0 auto;
+            width: auto;
+            max-width: 1400px;
+          }
+
+          .crew-masonry-column {
+            padding-left: 0;
+            background-clip: padding-box;
+          }
+
+          /* Desktop: 4 columns with 3rem (48px) gap */
+          @media (min-width: 1024px) {
+            .crew-masonry-grid {
+              margin-left: -3rem;
+            }
+            .crew-masonry-column {
+              padding-left: 3rem;
+            }
+            .crew-masonry-column > div {
+              margin-bottom: 3rem;
+            }
+          }
+
+          /* Tablet: 3 columns with 2rem (32px) gap */
+          @media (min-width: 768px) and (max-width: 1023px) {
+            .crew-masonry-grid {
+              margin-left: -2rem;
+            }
+            .crew-masonry-column {
+              padding-left: 2rem;
+            }
+            .crew-masonry-column > div {
+              margin-bottom: 2rem;
+            }
+          }
+
+          /* Mobile: 2 columns with 1.5rem (24px) gap */
+          @media (min-width: 481px) and (max-width: 767px) {
+            .crew-masonry-grid {
+              margin-left: -1.5rem;
+            }
+            .crew-masonry-column {
+              padding-left: 1.5rem;
+            }
+            .crew-masonry-column > div {
+              margin-bottom: 1.5rem;
+            }
+          }
+
+          /* Small mobile: 1 column with 2rem (32px) gap */
+          @media (max-width: 480px) {
+            .crew-masonry-grid {
+              margin-left: -2rem;
+            }
+            .crew-masonry-column {
+              padding-left: 2rem;
+            }
+            .crew-masonry-column > div {
+              margin-bottom: 2rem;
+            }
+          }
+        `}</style>
 
         {/* Decorative Text */}
         <motion.p 
@@ -106,6 +223,16 @@ export default function Crew() {
           Together, we create memories that last forever
         </motion.p>
       </div>
+
+      {/* Couple Card Modal */}
+      {activeCouple && (
+        <CoupleCard
+          couple={activeCouple.couple}
+          partner1={activeCouple.partner1}
+          partner2={activeCouple.partner2}
+          onClose={handleCloseCoupleCard}
+        />
+      )}
 
       {/* Gradient transition */}
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none" />
