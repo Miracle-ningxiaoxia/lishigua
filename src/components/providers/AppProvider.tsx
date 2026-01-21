@@ -4,7 +4,7 @@ import { createContext, useContext, useRef, ReactNode } from 'react'
 import MusicPlayer, { MusicPlayerRef } from '@/components/ui/MusicPlayer'
 
 interface AppContextType {
-  musicPlayerRef: React.RefObject<MusicPlayerRef> | null
+  musicPlayerRef: React.RefObject<MusicPlayerRef | null> | null
 }
 
 const AppContext = createContext<AppContextType>({ musicPlayerRef: null })
