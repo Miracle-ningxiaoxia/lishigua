@@ -24,7 +24,6 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      smoothTouch: false, // Disable on mobile for better performance
     })
 
     // Sync Lenis with GSAP ScrollTrigger
