@@ -63,24 +63,24 @@ export default function HomePage() {
   const titleRefs = useRef<(HTMLDivElement | null)[]>([])
   const previewRef = useRef<HTMLDivElement>(null)
 
-  // Check if user has visited intro
+  // Start music ONLY on first visit to homepage (not on returns from sub-pages)
   useEffect(() => {
-    const hasVisitedIntro = localStorage.getItem('hasVisitedIntro')
-    if (!hasVisitedIntro) {
-      // If first visit, redirect to intro
-      router.push('/intro')
+    const hasAutoPlayed = sessionStorage.getItem('hasAutoPlayedMusic')
+    
+    // Only auto-play once per session, and only if not already playing
+    if (!hasAutoPlayed) {
+      const timer = setTimeout(() => {
+        if (musicPlayerRef?.current && !musicPlayerRef.current.isPlaying()) {
+          console.log('First visit to homepage - auto-starting music')
+          musicPlayerRef.current.startMusic()
+          sessionStorage.setItem('hasAutoPlayedMusic', 'true')
+        }
+      }, 1000)
+
+      return () => clearTimeout(timer)
+    } else {
+      console.log('Returning to homepage - respecting user preference')
     }
-  }, [router])
-
-  // Start music on mount if not already playing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (musicPlayerRef?.current) {
-        musicPlayerRef.current.startMusic()
-      }
-    }, 1000)
-
-    return () => clearTimeout(timer)
   }, [musicPlayerRef])
 
   // Magnetic effect for menu items
