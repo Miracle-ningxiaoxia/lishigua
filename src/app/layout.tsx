@@ -5,6 +5,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/ui/CustomCursor";
 import Navigation from "@/components/ui/Navigation";
 import AppProvider from "@/components/providers/AppProvider";
+import AuthProvider from "@/components/providers/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,13 +37,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${dancingScript.variable} antialiased bg-black text-[#ededed]`}
       >
-        <CustomCursor />
-        <AppProvider>
-          <Navigation />
-          <SmoothScroll>
-            {children}
-          </SmoothScroll>
-        </AppProvider>
+        <AuthProvider>
+          <CustomCursor />
+          <AppProvider>
+            <Navigation />
+            <SmoothScroll>
+              {children}
+            </SmoothScroll>
+          </AppProvider>
+        </AuthProvider>
       </body>
     </html>
   );

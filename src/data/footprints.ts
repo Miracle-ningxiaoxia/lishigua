@@ -1,0 +1,42 @@
+export const footprintsData = [
+  {
+    id: 1,
+    name: '上海',
+    lat: 31.2304,
+    lng: 121.4737,
+    description: '一切开始的地方',
+    date: '2021-06-12',
+  },
+  {
+    id: 2,
+    name: '长野・白马',
+    lat: 36.6982,
+    lng: 137.8619,
+    description: '飞向雪国的记忆',
+    date: '2022-01-20',
+  },
+  {
+    id: 3,
+    name: '成都',
+    lat: 30.5728,
+    lng: 104.0668,
+    description: '火锅与晚风',
+    date: '2020-10-03',
+  },
+  {
+    id: 4,
+    name: '杭州',
+    lat: 30.2741,
+    lng: 120.1551,
+    description: '西子湖畔的漫步',
+    date: '2023-04-15',
+  },
+  {
+    id: 5,
+    name: '三亚',
+    lat: 18.2525,
+    lng: 109.5119,
+    description: '椰林与海浪',
+    date: '2022-07-08',
+  },
+];

@@ -49,8 +49,9 @@ const menuItems: MenuItem[] = [
     id: 'footprints',
     title: 'Footprints',
     chinese: '迹',
-    subtitle: '即将到来的记忆碎片',
-    route: '#',
+    subtitle: '走过的每一个地方',
+    route: '/footprints',
+    previewImage: '/images/crew/intro/couple-5.jpg',
     color: '#F59E0B', // amber
   },
 ]
