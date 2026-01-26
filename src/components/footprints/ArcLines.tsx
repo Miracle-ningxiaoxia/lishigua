@@ -78,6 +78,16 @@ function Arc({
   offset: number;
 }) {
   const glowRef = useRef<THREE.Mesh>(null);
+  
+  const lineObject = useMemo(() => {
+    const material = new THREE.LineBasicMaterial({
+      color: '#7ec3ff',
+      transparent: true,
+      opacity: 0.28,
+      toneMapped: false,
+    });
+    return new THREE.Line(geometry, material);
+  }, [geometry]);
 
   useFrame(({ clock }) => {
     const t = (clock.getElapsedTime() * speed + offset) % 1;
@@ -89,14 +99,7 @@ function Arc({
 
   return (
     <group>
-      <line geometry={geometry}>
-        <lineBasicMaterial
-          color="#7ec3ff"
-          transparent
-          opacity={0.28}
-          toneMapped={false}
-        />
-      </line>
+      <primitive object={lineObject} />
       <mesh ref={glowRef}>
         <sphereGeometry args={[0.03, 16, 16]} />
         <meshBasicMaterial color="#bfe5ff" toneMapped={false} />
