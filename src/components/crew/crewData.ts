@@ -93,7 +93,7 @@ export const crewMembers: CrewMember[] = [
     id: 'crew-7',
     name: '小霞',
     nickname: '宁老师',
-    role: '见证人',
+    role: '21点我就要回家了',
     quote: '我作证，王睿是吐王',
     avatarUrl: '/images/crew/intro/nxx.jpg',
     color: '#10b981', // emerald-500
@@ -104,7 +104,7 @@ export const crewMembers: CrewMember[] = [
     id: 'crew-8',
     name: '邱雪晶',
     nickname: '小邱',
-    role: '颜值担当',
+    role: '小邱小邱',
     quote: '李清文最帅',
     avatarUrl: '/images/crew/intro/qxj.jpg',
     color: '#14b8a6', // teal-500
@@ -137,7 +137,7 @@ export const crewMembers: CrewMember[] = [
     id: 'crew-11',
     name: '唐蛋',
     nickname: '蛋蛋',
-    role: '毒舌王',
+    role: '酒仙',
     quote: '恕我直言，在座的各位都是垃圾',
     avatarUrl: '/images/crew/intro/trd.jpg',
     color: '#ef4444', // red-500
@@ -148,7 +148,7 @@ export const crewMembers: CrewMember[] = [
     id: 'crew-12',
     name: '王老师',
     nickname: '王老师',
-    role: '最差导师',
+    role: '最优导师',
     quote: '你们真的是我带的最差的一届',
     avatarUrl: '/images/crew/intro/wls.jpg',
     color: '#dc2626', // red-600
@@ -159,7 +159,7 @@ export const crewMembers: CrewMember[] = [
     id: 'crew-13',
     name: '佳姐',
     nickname: '佳姐',
-    role: '酒神',
+    role: '灵魂画手',
     quote: '把唐蛋喝翻再来找我喝酒哈',
     avatarUrl: '/images/crew/intro/zyj.jpg',
     color: '#84cc16', // lime-500
@@ -170,7 +170,7 @@ export const crewMembers: CrewMember[] = [
     id: 'crew-14',
     name: '袁老师',
     nickname: '袁老师',
-    role: '喝酒教练',
+    role: '教学督导',
     quote: '大家好，我是袁老师，我教范小车怎么喝酒不睡觉',
     avatarUrl: '/images/crew/intro/fxjdx.jpg',
     color: '#22c55e', // green-500

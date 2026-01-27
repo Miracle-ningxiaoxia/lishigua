@@ -11,6 +11,7 @@ export interface Member {
   name: string;
   invite_code: string;
   couple_id: number | null;
+  avatar?: string | null; // 头像 URL
   created_at: string;
 }
 

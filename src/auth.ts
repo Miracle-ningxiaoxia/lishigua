@@ -32,6 +32,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: member.id,
           name: member.name,
           coupleId: member.couple_id,
+          avatar: member.avatar || undefined, // 头像 URL
         };
       },
     }),
@@ -43,6 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.name = user.name;
         token.coupleId = (user as any).coupleId;
+        token.avatar = (user as any).avatar;
       }
       return token;
     },
@@ -52,6 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string;
         session.user.name = token.name as string;
         session.user.coupleId = token.coupleId as number | null;
+        session.user.avatar = token.avatar as string | undefined;
       }
       return session;
     },

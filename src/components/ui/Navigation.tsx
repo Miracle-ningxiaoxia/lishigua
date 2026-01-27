@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import { Home, LogOut, User } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
+import Image from 'next/image'
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -58,20 +59,48 @@ export default function Navigation() {
             whileHover={{ scale: 1.02, borderColor: 'rgba(139, 92, 246, 0.4)' }}
             data-cursor="hover"
           >
-            {/* 头像预留位 - 渐变圆形 */}
-            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              {/* 头像占位图标 */}
-              <User className="w-5 h-5 text-white" strokeWidth={2.5} />
-              
-              {/* 光环效果 */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
-              {/* 未来可以替换为真实头像 */}
-              {/* <img 
-                src={session.user.avatar || '/default-avatar.png'} 
-                alt={session.user.name}
-                className="w-full h-full object-cover"
-              /> */}
+            {/* 头像容器 */}
+            <div className="relative">
+              {/* 在线状态呼吸灯 - 移到头像外层 */}
+              <motion.div
+                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-400 border-2 border-black z-10"
+                animate={{ 
+                  opacity: [1, 0.5, 1],
+                  scale: [1, 0.9, 1]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+              />
+
+              <div className="relative w-10 h-10 rounded-full overflow-hidden group-hover:scale-110 transition-transform duration-300">
+                {session.user.avatar ? (
+                  // 真实头像 - 使用 Next.js Image 优化
+                  <>
+                    <div className="absolute inset-0 rounded-full ring-2 ring-purple-400/50 z-10" />
+                    <Image
+                      src={session.user.avatar}
+                      alt={session.user.name || '用户头像'}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover"
+                      priority
+                      unoptimized
+                    />
+                    {/* 悬停光环效果 */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20" />
+                  </>
+                ) : (
+                  // 降级占位符 - 渐变圆形
+                  <div className="w-full h-full bg-gradient-to-br from-purple-400 via-pink-400 to-blue-400 flex items-center justify-center">
+                    <User className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    {/* 光环效果 */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* 用户信息文本 */}
@@ -82,22 +111,6 @@ export default function Navigation() {
               <span className="text-xs font-mono text-white/40 group-hover:text-white/60 transition-colors">
                 拾光纪成员
               </span>
-            </div>
-
-            {/* 装饰性指示点 */}
-            <div className="flex items-center gap-1 ml-2">
-              <motion.div
-                className="w-1.5 h-1.5 rounded-full bg-green-400"
-                animate={{ 
-                  opacity: [1, 0.5, 1],
-                  scale: [1, 0.8, 1]
-                }}
-                transition={{ 
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: 'easeInOut'
-                }}
-              />
             </div>
           </motion.div>
 

@@ -20,36 +20,36 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   {
     id: 'intro',
-    title: 'Introduction',
-    chinese: '启',
-    subtitle: '时间之锚，故事之始',
+    title: 'Free Range Humans',
+    chinese: '自由散养人类',
+    subtitle: '成长不设限，做自己的主人',
     route: '/intro',
     previewImage: '/images/crew/intro/couple-4.jpg',
     color: '#8B5CF6', // purple
   },
   {
     id: 'crew',
-    title: 'The Crew',
-    chinese: '众',
-    subtitle: '群星汇聚，温暖如初',
+    title: 'Joy First Load',
+    chinese: '快乐优先加载',
+    subtitle: '快乐是最高优先级，欢声永不缓存',
     route: '/crew',
     previewImage: '/images/crew/couples/couple-1.jpg',
     color: '#EC4899', // pink
   },
   {
     id: 'vault',
-    title: 'The Vault',
-    chinese: '境',
-    subtitle: '未来的回音，此刻的期许',
+    title: 'Sunshine Fragments',
+    chinese: '收集阳光碎片',
+    subtitle: '每一刻温暖都值得珍藏',
     route: '/vault',
     previewImage: '/images/crew/intro/cgz.jpg',
     color: '#06B6D4', // cyan
   },
   {
     id: 'footprints',
-    title: 'Footprints',
-    chinese: '迹',
-    subtitle: '走过的每一个地方',
+    title: 'Whispers Through Time',
+    chinese: '岁岁年年碎碎念',
+    subtitle: '那些年，那些话，那些事',
     route: '/footprints',
     previewImage: '/images/crew/intro/couple-5.jpg',
     color: '#F59E0B', // amber
@@ -221,7 +221,7 @@ export default function HomePage() {
                   />
                   
                   <h3
-                    className="relative text-7xl md:text-8xl lg:text-9xl font-light text-white/90 tracking-wider transition-all duration-500 group-hover:text-white"
+                    className="relative text-4xl md:text-5xl lg:text-6xl font-light text-white/90 tracking-wide transition-all duration-500 group-hover:text-white"
                     style={{
                       textShadow: hoveredItem?.id === item.id 
                         ? `0 0 30px ${item.color}80, 0 0 60px ${item.color}40`
