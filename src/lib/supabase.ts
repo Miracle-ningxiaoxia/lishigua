@@ -15,6 +15,25 @@ export interface Member {
   created_at: string;
 }
 
+// 定义 Photo 类型
+export interface Photo {
+  id: string;
+  url: string;
+  storage_path: string;
+  caption?: string | null;
+  author_id: string;
+  width?: number | null;
+  height?: number | null;
+  blur_hash?: string | null;
+  created_at: string;
+  // 关联的作者信息（通过 JOIN 查询获得）
+  author?: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  };
+}
+
 // 验证邀请码
 export async function verifyInviteCode(inviteCode: string): Promise<Member | null> {
   const { data, error } = await supabase

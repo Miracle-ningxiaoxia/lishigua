@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
     formats: ['image/webp', 'image/avif'], // 使用现代格式
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840], // 响应式尺寸
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // 小图尺寸
+    // 开发环境禁用优化，避免 400 错误（可选）
+    unoptimized: process.env.NODE_ENV === 'development',
   },
   // 性能优化
   compress: true, // 启用 Gzip 压缩

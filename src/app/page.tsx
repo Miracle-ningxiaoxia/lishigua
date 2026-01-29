@@ -37,6 +37,15 @@ const menuItems: MenuItem[] = [
     color: '#EC4899', // pink
   },
   {
+    id: 'photos',
+    title: 'Captured Moments',
+    chinese: '挚友碰头、快乐上头',
+    subtitle: '那些被定格的瞬间，成为了永恒的记忆',
+    route: '/photos',
+    previewImage: '/images/crew/intro/couple-6.jpg',
+    color: '#10B981', // emerald
+  },
+  {
     id: 'vault',
     title: 'Sunshine Fragments',
     chinese: '收集阳光碎片',

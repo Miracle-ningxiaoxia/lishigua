@@ -106,3 +106,26 @@ body {
 [data-sonner-toast] [data-button]:hover {
   background: rgba(255, 255, 255, 0.15) !important;
 }
+
+/* Masonry Layout - 瀑布流 */
+.my-masonry-grid {
+  display: flex;
+  margin-left: -16px; /* gutter size offset */
+  width: auto;
+}
+
+.my-masonry-grid_column {
+  padding-left: 16px; /* gutter size */
+  background-clip: padding-box;
+}
+
+/* 平滑滚动 */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
