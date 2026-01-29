@@ -62,7 +62,6 @@ export default function HomePage() {
   const [hoveredItem, setHoveredItem] = useState<MenuItem | null>(null)
   const [isNavigating, setIsNavigating] = useState(false)
   const titleRefs = useRef<(HTMLDivElement | null)[]>([])
-  const previewRef = useRef<HTMLDivElement>(null)
 
   // Start music ONLY on first visit to homepage (not on returns from sub-pages)
   useEffect(() => {
@@ -154,26 +153,6 @@ export default function HomePage() {
     }, 300)
   }
 
-  // Preview image animation
-  useEffect(() => {
-    if (hoveredItem && previewRef.current) {
-      gsap.fromTo(
-        previewRef.current,
-        {
-          scale: 0.8,
-          opacity: 0,
-          filter: 'blur(20px)',
-        },
-        {
-          scale: 1,
-          opacity: 1,
-          filter: 'blur(0px)',
-          duration: 0.8,
-          ease: 'power3.out',
-        }
-      )
-    }
-  }, [hoveredItem])
 
   return (
     <main className="relative w-full min-h-screen overflow-hidden">
@@ -285,48 +264,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Preview Image (Center) */}
-      <AnimatePresence>
-        {hoveredItem && hoveredItem.previewImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 flex items-center justify-center pointer-events-none z-0"
-          >
-            <div
-              ref={previewRef}
-              className="relative w-64 h-64 md:w-96 md:h-96 rounded-full overflow-hidden"
-              style={{
-                boxShadow: `0 0 100px 40px ${hoveredItem.color}30`,
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-radial from-transparent to-black/60" />
-              <img
-                src={hoveredItem.previewImage}
-                alt={hoveredItem.title}
-                className="w-full h-full object-cover opacity-40"
-              />
-              
-              {/* Light ring effect */}
-              <motion.div
-                className="absolute inset-0 rounded-full border-4 opacity-40"
-                style={{ borderColor: hoveredItem.color }}
-                animate={{
-                  scale: [1, 1.1, 1],
-                  opacity: [0.4, 0.2, 0.4],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Footer */}
       <motion.div

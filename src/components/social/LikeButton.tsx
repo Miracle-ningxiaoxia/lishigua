@@ -113,23 +113,33 @@ export default function LikeButton({
     setParticles((prev) => [...prev, ...newParticles])
   }
 
-  // 处理点赞
+  // 处理点赞（乐观更新）
   const handleLike = async () => {
     if (!session?.user?.id || isLoading) return
 
     setIsLoading(true)
 
+    // ✅ 乐观更新：立即更新本地状态
+    const willLike = !hasLiked
+    const previousLiked = hasLiked
+    const previousCount = likeCount
+
+    setHasLiked(willLike)
+    setLikeCount((prev) => (willLike ? prev + 1 : prev - 1))
+
     // 触发粒子效果（在点赞时）
-    if (!hasLiked && buttonRef.current) {
+    if (willLike && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect()
       createParticles(rect.width / 2, rect.height / 2)
     }
 
+    // 调用 API
     const result = await toggleLike(targetId, targetType, session.user.id, targetOwnerId)
 
-    if (result.success) {
-      setHasLiked(result.hasLiked)
-      setLikeCount((prev) => (result.hasLiked ? prev + 1 : prev - 1))
+    // ❌ 如果失败，回滚状态
+    if (!result.success) {
+      setHasLiked(previousLiked)
+      setLikeCount(previousCount)
     }
 
     setIsLoading(false)
