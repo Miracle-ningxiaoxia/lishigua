@@ -34,8 +34,8 @@ export default function AnecdoteItem({ anecdote, onClick, onCommentClick }: Anec
     }
   }
 
-  const handleCommentClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handleCommentClick = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
     onCommentClick?.()
   }
 
