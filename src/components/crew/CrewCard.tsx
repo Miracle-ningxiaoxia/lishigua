@@ -161,15 +161,15 @@ export default function CrewCard({
           rotateY: isHovered ? rotateY : 0,
           transformStyle: 'preserve-3d',
           borderColor: isActivated ? member.color : 'rgba(255,255,255,0.1)',
+          boxShadow: isActivated 
+            ? `0 0 40px ${member.color}60, 0 0 80px ${member.color}30`
+            : '0 0 0px transparent',
         }}
         animate={{
           opacity: isDimmed ? 0.4 : 1,
           scale: isHovered ? 1.05 : isActivated ? 1.03 : 1,
           y: isHovered ? -10 : isActivated ? -5 : 0,
           filter: isDimmed ? 'grayscale(0.5)' : 'grayscale(0)',
-          boxShadow: isActivated 
-            ? `0 0 40px ${member.color}60, 0 0 80px ${member.color}30`
-            : '0 0 0px transparent',
         }}
         transition={{ duration: 0.4, ease: "easeOut" }}
         onClick={onClick}
@@ -224,7 +224,7 @@ export default function CrewCard({
         <div className="relative z-10 flex flex-col items-center h-full">
           {/* Avatar Circle (The Core) */}
           <motion.div
-            className="relative w-36 h-36 rounded-full overflow-hidden mb-6 mt-4"
+            className="relative w-36 h-36 rounded-full overflow-hidden mb-6 mt-4 bg-black/30"
             animate={{
               scale: isHovered ? 1.08 : 1,
             }}
@@ -260,8 +260,9 @@ export default function CrewCard({
                 src={member.avatarUrl}
                 alt={member.name}
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="144px"
+                loading={index < 4 ? "eager" : "lazy"}
               />
             </motion.div>
           </motion.div>

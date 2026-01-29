@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import type { Letter } from './LetterEnvelope'
+import { LikeButton, CommentButton, CommentSection } from '@/components/social'
 
 interface LetterViewProps {
   letter: Letter
@@ -10,10 +12,13 @@ interface LetterViewProps {
 }
 
 export default function LetterView({ letter, onClose }: LetterViewProps) {
+  const [showComments, setShowComments] = useState(false)
+  
   // Split content into paragraphs for staggered animation
   const paragraphs = letter.content.split('\n\n').filter(p => p.trim())
 
   return (
+    <>
     <motion.div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8"
       initial={{ opacity: 0 }}
@@ -87,16 +92,43 @@ export default function LetterView({ letter, onClose }: LetterViewProps) {
           ))}
         </div>
 
-        {/* Footer decoration */}
+        {/* Social Actions */}
         <motion.div
-          className="mt-12 pt-8 border-t border-white/10 flex justify-center"
+          className="mt-12 pt-8 border-t border-white/10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 0.8 }}
         >
-          <div className="w-16 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full" />
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <LikeButton 
+              targetId={letter.id}
+              targetType="anecdote"
+              size="md"
+              showCount={true}
+            />
+            
+            <CommentButton
+              moduleId={`letter-${letter.id}`}
+              onClick={() => setShowComments(true)}
+              size="md"
+              showCount={true}
+            />
+          </div>
+          
+          {/* Decorative line */}
+          <div className="flex justify-center">
+            <div className="w-16 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent rounded-full" />
+          </div>
         </motion.div>
       </motion.div>
     </motion.div>
+
+    {/* Comment Section - 独立在外，避免被背景点击关闭 */}
+    <CommentSection 
+      moduleId={`letter-${letter.id}`}
+      isOpen={showComments}
+      onClose={() => setShowComments(false)}
+    />
+    </>
   )
 }

@@ -18,7 +18,7 @@ export default function Hero() {
   const opacity = useTransform(scrollY, [0, 500], [1, 0])
 
   // Content
-  const title = "ECHOES | 拾光纪"
+  const title = "ECHOES | 时光快递驿站"
   
   return (
     <section 

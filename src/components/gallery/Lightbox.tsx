@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import Image from 'next/image'
+import { LikeButton, CommentButton, CommentSection } from '@/components/social'
 
 interface GalleryItem {
   id: string
@@ -19,18 +21,22 @@ interface LightboxProps {
 }
 
 export default function Lightbox({ item, onClose }: LightboxProps) {
+  const [showComments, setShowComments] = useState(false)
+  
   if (!item) return null
 
   return (
-    <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
-        onClick={onClose}
-      >
+    <>
+      <AnimatePresence>
+        <motion.div
+          key="lightbox"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          onClick={onClose}
+        >
         {/* Backdrop */}
         <motion.div 
           className="absolute inset-0 backdrop-blur-xl bg-black/90"
@@ -62,14 +68,14 @@ export default function Lightbox({ item, onClose }: LightboxProps) {
           {/* Image with Shared Layout */}
           <motion.div
             layoutId={item.id}
-            className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden mb-6 bg-neutral-900"
+            className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden mb-6 bg-black/90"
             style={{ willChange: 'transform' }}
           >
             <Image
               src={item.fullImage}
               alt={item.title}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
               priority
               quality={95}
@@ -91,12 +97,37 @@ export default function Lightbox({ item, onClose }: LightboxProps) {
                 {item.date}
               </span>
             </div>
-            <p className="text-neutral-300 text-base md:text-lg leading-relaxed">
+            <p className="text-neutral-300 text-base md:text-lg leading-relaxed mb-6">
               {item.description}
             </p>
+
+            {/* 社交互动按钮 */}
+            <div className="flex items-center gap-4 pt-4 border-t border-white/10">
+              <LikeButton 
+                targetId={item.id} 
+                targetType="photo" 
+                size="md" 
+                showCount={true}
+              />
+              
+              <CommentButton
+                moduleId={`gallery-${item.id}`}
+                onClick={() => setShowComments(true)}
+                size="md"
+                showCount={true}
+              />
+            </div>
           </motion.div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+      </AnimatePresence>
+
+      {/* 评论抽屉 - 独立在外，有自己的 AnimatePresence */}
+      <CommentSection 
+        moduleId={`gallery-${item.id}`}
+        isOpen={showComments}
+        onClose={() => setShowComments(false)}
+      />
+    </>
   )
 }

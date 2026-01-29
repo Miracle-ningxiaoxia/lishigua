@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import AnecdoteItem, { Anecdote } from './AnecdoteItem'
+import { CommentSection } from '@/components/social'
 
 // Anecdotes data
 const anecdotesData: Anecdote[] = [
@@ -78,6 +79,7 @@ const categories = [
 export default function Anecdotes() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [selectedAnecdote, setSelectedAnecdote] = useState<Anecdote | null>(null)
+  const [commentAnecdoteId, setCommentAnecdoteId] = useState<string | null>(null)
 
   const filteredAnecdotes = activeCategory === 'all' 
     ? anecdotesData 
@@ -164,6 +166,7 @@ export default function Anecdotes() {
                 <AnecdoteItem
                   anecdote={anecdote}
                   onClick={() => anecdote.type === 'image' && setSelectedAnecdote(anecdote)}
+                  onCommentClick={() => setCommentAnecdoteId(anecdote.id)}
                 />
               </motion.div>
             ))}
@@ -184,8 +187,14 @@ export default function Anecdotes() {
         </motion.div>
       </div>
 
-      {/* Lightbox for images (similar to Gallery) */}
-      {/* This can be added if needed, reusing Gallery's Lightbox component */}
+      {/* Comment Section */}
+      {commentAnecdoteId && (
+        <CommentSection 
+          moduleId={`anecdote-${commentAnecdoteId}`}
+          isOpen={!!commentAnecdoteId}
+          onClose={() => setCommentAnecdoteId(null)}
+        />
+      )}
 
       {/* Gradient transition */}
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black via-black/50 to-transparent pointer-events-none" />

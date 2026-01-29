@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import Image from 'next/image'
 import { Couple, CrewMember } from './crewData'
+import { LikeButton, CommentButton, CommentSection } from '@/components/social'
 
 interface CoupleCardProps {
   couple: Couple
@@ -13,15 +15,19 @@ interface CoupleCardProps {
 }
 
 export default function CoupleCard({ couple, partner1, partner2, onClose }: CoupleCardProps) {
+  const [showComments, setShowComments] = useState(false)
+  
   return (
-    <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 z-[100] flex items-center justify-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.4 }}
-      >
+    <>
+      <AnimatePresence>
+        <motion.div
+          key="couple-card"
+          className="fixed inset-0 z-[100] flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+        >
         {/* Backdrop with couple's accent color */}
         <motion.div
           className="absolute inset-0"
@@ -56,14 +62,15 @@ export default function CoupleCard({ couple, partner1, partner2, onClose }: Coup
             transition: { duration: 0.3 }
           }}
         >
-          <div className="relative aspect-[3/2] rounded-3xl overflow-hidden backdrop-blur-2xl bg-white/5 border-2 border-white/20 shadow-2xl">
+          <div className="relative aspect-[3/2] rounded-3xl overflow-hidden backdrop-blur-2xl bg-black/50 border-2 border-white/20 shadow-2xl">
             {/* Couple Image */}
             {couple.coupleImage ? (
               <Image
                 src={couple.coupleImage}
                 alt={`${partner1.name} & ${partner2.name}`}
                 fill
-                className="object-cover"
+                className="object-contain"
+                sizes="(max-width: 768px) 90vw, (max-width: 1200px) 80vw, 1200px"
                 priority
               />
             ) : (
@@ -159,7 +166,7 @@ export default function CoupleCard({ couple, partner1, partner2, onClose }: Coup
 
               {/* Declaration */}
               <motion.div
-                className="backdrop-blur-2xl bg-white/10 border border-white/30 rounded-2xl p-6 md:p-8"
+                className="backdrop-blur-2xl bg-white/10 border border-white/30 rounded-2xl p-6 md:p-8 space-y-4"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
@@ -167,6 +174,23 @@ export default function CoupleCard({ couple, partner1, partner2, onClose }: Coup
                 <p className="font-hand text-xl md:text-3xl text-white text-center leading-relaxed">
                   &ldquo;{couple.declaration}&rdquo;
                 </p>
+                
+                {/* Social Actions */}
+                <div className="flex items-center justify-center gap-4 pt-4 border-t border-white/20">
+                  <LikeButton 
+                    targetId={couple.id}
+                    targetType="photo"
+                    size="md"
+                    showCount={true}
+                  />
+                  
+                  <CommentButton
+                    moduleId={`couple-${couple.id}`}
+                    onClick={() => setShowComments(true)}
+                    size="md"
+                    showCount={true}
+                  />
+                </div>
               </motion.div>
             </div>
 
@@ -196,6 +220,14 @@ export default function CoupleCard({ couple, partner1, partner2, onClose }: Coup
           点击任意处关闭
         </motion.p>
       </motion.div>
-    </AnimatePresence>
+      </AnimatePresence>
+
+      {/* Comment Section - 独立在外，有自己的 AnimatePresence */}
+      <CommentSection 
+        moduleId={`couple-${couple.id}`}
+        isOpen={showComments}
+        onClose={() => setShowComments(false)}
+      />
+    </>
   )
 }

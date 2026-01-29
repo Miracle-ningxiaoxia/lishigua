@@ -73,14 +73,19 @@ export default function HomePage() {
       const timer = setTimeout(() => {
         if (musicPlayerRef?.current && !musicPlayerRef.current.isPlaying()) {
           console.log('First visit to homepage - auto-starting music')
-          musicPlayerRef.current.startMusic()
+          musicPlayerRef.current.startMusic().catch(err => {
+            console.log('Failed to start music on homepage:', err)
+          })
+          sessionStorage.setItem('hasAutoPlayedMusic', 'true')
+        } else if (musicPlayerRef?.current?.isPlaying()) {
+          console.log('Music already playing from login page')
           sessionStorage.setItem('hasAutoPlayedMusic', 'true')
         }
       }, 1000)
 
       return () => clearTimeout(timer)
     } else {
-      console.log('Returning to homepage - respecting user preference')
+      console.log('Returning to homepage - music auto-play already triggered')
     }
   }, [musicPlayerRef])
 
@@ -185,7 +190,7 @@ export default function HomePage() {
           Memory Archive
         </h1>
         <h2 className="text-4xl md:text-5xl font-light text-white/90 tracking-wider">
-          拾光纪
+          时光快递驿站
         </h2>
       </motion.div>
 

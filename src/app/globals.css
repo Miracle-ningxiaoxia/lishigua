@@ -45,6 +45,21 @@ body {
   background: #555;
 }
 
+/* Custom Scrollbar for Modal/Drawer */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 /* Custom Radial Gradient */
 .bg-gradient-radial {
   background-image: radial-gradient(circle, var(--tw-gradient-stops));
@@ -53,4 +68,41 @@ body {
 /* Smooth transitions for all interactive elements */
 [data-cursor="hover"] {
   transition: transform 0.3s ease;
+}
+
+/* Toast Notifications - 玻璃拟态风格 */
+[data-sonner-toast] {
+  background: rgba(0, 0, 0, 0.85) !important;
+  backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-sonner-toast][data-type="success"] {
+  border-color: rgba(34, 197, 94, 0.3) !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  background: rgba(0, 0, 0, 0.9) !important;
+}
+
+[data-sonner-toast] [data-title] {
+  color: rgba(255, 255, 255, 0.95) !important;
+  font-weight: 500 !important;
+}
+
+[data-sonner-toast] [data-description] {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+[data-sonner-toast] [data-button] {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-sonner-toast] [data-button]:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
 }

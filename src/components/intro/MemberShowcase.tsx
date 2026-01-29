@@ -1,16 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
+import { motion, animate } from 'framer-motion'
 import Image from 'next/image'
-
-// Register GSAP plugins
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
-}
+import { LikeButton, CommentButton, CommentSection } from '@/components/social'
 
 interface Member {
   id: string
@@ -138,139 +131,221 @@ const members: Member[] = [
 
 export default function MemberShowcase() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<HTMLDivElement>(null)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const isScrollingRef = useRef(false)
+  const [commentMemberId, setCommentMemberId] = useState<string | null>(null)
 
+  // Track scroll position to update progress indicator
   useEffect(() => {
-    if (!containerRef.current || !cardsRef.current) return
-
     const container = containerRef.current
-    const cards = cardsRef.current
+    if (!container) return
 
-    // Calculate total scroll distance
-    const totalWidth = cards.scrollWidth
-    const viewportWidth = window.innerWidth
-    const scrollDistance = totalWidth - viewportWidth
-
-    // Create horizontal scroll animation with optimized settings
-    const scrollTween = gsap.to(cards, {
-      x: -scrollDistance,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: container,
-        pin: true,
-        pinSpacing: true,
-        scrub: 1,
-        anticipatePin: 1,
-        // Bind end point to the actual scroll distance needed
-        end: () => `+=${scrollDistance + viewportWidth * 0.5}`,
-        // Snap to key positions for precise alignment
-        snap: {
-          snapTo: [0, 0.2, 0.4, 0.6, 0.8, 1], // Snap points for each section
-          duration: { min: 0.2, max: 0.4 },
-          delay: 0,
-          ease: 'power1.inOut'
-        }
-      },
-    })
-
-    return () => {
-      scrollTween.kill()
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+    const handleScroll = () => {
+      const scrollLeft = container.scrollLeft
+      const cardWidth = container.offsetWidth
+      const index = Math.round(scrollLeft / cardWidth)
+      setCurrentIndex(index)
     }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Convert mouse wheel vertical scroll to horizontal scroll with Framer Motion animation
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const handleWheel = (e: WheelEvent) => {
+      // Only convert vertical scroll (deltaY) to horizontal
+      // Keep native horizontal scroll from trackpad (deltaX)
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault()
+
+        // Throttle: prevent scroll spam
+        if (isScrollingRef.current) return
+        isScrollingRef.current = true
+
+        // Calculate current card index
+        const cardWidth = container.offsetWidth
+        const currentScrollLeft = container.scrollLeft
+        const currentCard = Math.round(currentScrollLeft / cardWidth)
+
+        // Determine target card (next or previous)
+        const direction = e.deltaY > 0 ? 1 : -1
+        const targetCard = Math.max(0, Math.min(members.length - 1, currentCard + direction))
+        const targetPosition = targetCard * cardWidth
+
+        // Animate scroll position with Framer Motion for ultra-smooth transition
+        animate(currentScrollLeft, targetPosition, {
+          type: "spring",
+          stiffness: 120,
+          damping: 20,
+          mass: 0.8,
+          onUpdate: (latest) => {
+            container.scrollLeft = latest
+          },
+          onComplete: () => {
+            isScrollingRef.current = false
+          }
+        })
+      }
+    }
+
+    container.addEventListener('wheel', handleWheel, { passive: false })
+    return () => container.removeEventListener('wheel', handleWheel)
   }, [])
 
   return (
-    <div ref={containerRef} className="relative h-screen w-full bg-black overflow-hidden">
-      {/* Horizontal cards container */}
+    <div className="relative h-screen w-full bg-black">
+      {/* Native horizontal scroll container with CSS Scroll Snap */}
       <div
-        ref={cardsRef}
-        className="flex h-full items-center"
-        style={{ width: `${members.length * 100}vw` }}
+        ref={containerRef}
+        className="h-full overflow-x-auto overflow-y-hidden snap-x snap-mandatory"
+        style={{
+          scrollBehavior: 'smooth',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch'
+        }}
       >
-        {members.map((member, index) => (
-          <div
-            key={member.id}
-            className="relative w-screen h-full flex items-center justify-center px-16"
-          >
-            {/* Background code text */}
-            <motion.div
-              className="absolute inset-0 flex items-center justify-center pointer-events-none"
-              initial={{ opacity: 0, scale: 0.8, filter: 'blur(20px)' }}
-              whileInView={{ opacity: 0.05, scale: 1, filter: 'blur(0px)' }}
-              transition={{ duration: 1, delay: 0.3 }}
-              viewport={{ once: false, amount: 0.5 }}
-            >
-              <p className="text-[20vw] font-bold text-white">
-                {member.code}
-              </p>
-            </motion.div>
+        {/* Hide scrollbar for webkit browsers */}
+        <style jsx>{`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
 
-            {/* Card content */}
-            <motion.div
-              className="relative z-10 max-w-5xl w-full flex flex-col md:flex-row items-center gap-12"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: false, amount: 0.5 }}
+        {/* Horizontal cards flex container */}
+        <div className="flex h-full">
+          {members.map((member, index) => (
+            <div
+              key={member.id}
+              className="relative flex-shrink-0 w-screen h-full flex items-center justify-center snap-center snap-always"
             >
-              {/* Image */}
-              <div className="w-full md:w-1/2 aspect-[3/4] rounded-3xl overflow-hidden backdrop-blur-md bg-white/5 border border-white/10 relative">
-                <Image 
-                  src={member.image} 
-                  alt={member.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  priority={index < 3}
-                />
-                {/* Gradient overlay for better text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-              </div>
+              {/* Background code text */}
+              <motion.div
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 0.05, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                viewport={{ once: false, amount: 0.3, margin: "-20%" }}
+                style={{ filter: 'blur(0px)' }}
+              >
+                <p className="text-[20vw] font-bold select-none" style={{ color: 'rgba(255, 255, 255, 1)' }}>
+                  {member.code}
+                </p>
+              </motion.div>
 
-              {/* Info */}
-              <div className="w-full md:w-1/2 space-y-6">
-                <div>
-                  <h2 className="text-5xl md:text-6xl font-bold text-white mb-2">
-                    {member.name}
-                  </h2>
-                  <p className="font-hand text-2xl text-white/50">
-                    {member.nickname}
-                  </p>
+              {/* Card content */}
+              <motion.div
+                className="relative z-10 max-w-5xl w-full mx-auto px-8 md:px-16 flex flex-col md:flex-row items-center gap-8 md:gap-12"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                viewport={{ once: false, amount: 0.3, margin: "-20%" }}
+              >
+                {/* Image */}
+                <div className="w-full md:w-1/2 aspect-[3/4] rounded-3xl overflow-hidden backdrop-blur-md bg-black/30 border border-white/10 relative">
+                  <Image 
+                    src={member.image} 
+                    alt={member.name}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority={index < 3}
+                  />
+                  {/* Gradient overlay for better text readability */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
                 </div>
 
-                <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6">
-                  <p className="font-hand text-xl md:text-2xl text-white/90 leading-relaxed">
-                    &ldquo;{member.quote}&rdquo;
-                  </p>
-                </div>
+                {/* Info */}
+                <div className="w-full md:w-1/2 space-y-6">
+                  <div>
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2">
+                      {member.name}
+                    </h2>
+                    <p className="font-hand text-xl md:text-2xl text-white/50">
+                      {member.nickname}
+                    </p>
+                  </div>
 
-                {/* Progress indicator */}
-                <div className="flex items-center gap-2 pt-4">
-                  {members.map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-1 rounded-full transition-all duration-300 ${
-                        i === index ? 'w-12 bg-white/60' : 'w-8 bg-white/20'
-                      }`}
+                  <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <p className="font-hand text-lg md:text-xl lg:text-2xl text-white/90 leading-relaxed">
+                      &ldquo;{member.quote}&rdquo;
+                    </p>
+                  </div>
+
+                  {/* 社交互动按钮 */}
+                  <div className="flex items-center gap-4 pt-2">
+                    <LikeButton 
+                      targetId={member.id}
+                      targetType="photo"
+                      size="md"
+                      showCount={true}
                     />
-                  ))}
+                    
+                    <CommentButton
+                      moduleId={`intro-member-${member.id}`}
+                      onClick={() => setCommentMemberId(member.id)}
+                      size="md"
+                      showCount={true}
+                    />
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          </div>
+              </motion.div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 评论抽屉 */}
+      {commentMemberId && (
+        <CommentSection 
+          moduleId={`intro-member-${commentMemberId}`}
+          isOpen={!!commentMemberId}
+          onClose={() => setCommentMemberId(null)}
+        />
+      )}
+
+      {/* Progress indicator - fixed at bottom center */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+        {members.map((_, i) => (
+          <div
+            key={i}
+            className={`h-1 rounded-full transition-all duration-300 ${
+              i === currentIndex ? 'w-12 bg-white/60' : 'w-8 bg-white/20'
+            }`}
+          />
         ))}
       </div>
 
       {/* Scroll hint (bottom) */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20"
+        className="absolute bottom-20 left-1/2 -translate-x-1/2 z-20"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
       >
-        <p className="font-mono text-xs text-white/30 uppercase tracking-[0.3em]">
-          滚动查看更多
-        </p>
+        <div className="flex items-center gap-3">
+          <motion.div
+            animate={{ x: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="text-white/30"
+          >
+            ←
+          </motion.div>
+          <p className="font-mono text-xs text-white/30 uppercase tracking-[0.3em]">
+            横向滚动查看
+          </p>
+          <motion.div
+            animate={{ x: [0, 10, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="text-white/30"
+          >
+            →
+          </motion.div>
+        </div>
       </motion.div>
     </div>
   )

@@ -5,17 +5,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import IntroTitle from './IntroTitle'
 import MemberShowcase from './MemberShowcase'
 
-interface IntroOrchestratorProps {
-  onMusicStart: () => void
-}
-
-export default function IntroOrchestrator({ onMusicStart }: IntroOrchestratorProps) {
+export default function IntroOrchestrator() {
   const [stage, setStage] = useState<'title' | 'showcase'>('title')
 
   const handleEnter = () => {
-    // Start music
-    onMusicStart()
-    
     // Move to showcase stage
     setTimeout(() => {
       setStage('showcase')

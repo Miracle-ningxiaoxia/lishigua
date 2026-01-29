@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
@@ -7,7 +8,31 @@ interface IntroTitleProps {
   onEnter: () => void
 }
 
+// 生成固定的粒子位置（避免 hydration mismatch）
+const generateParticles = () => 
+  Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    duration: 3 + Math.random() * 2,
+    delay: Math.random() * 2,
+  }))
+
 export default function IntroTitle({ onEnter }: IntroTitleProps) {
+  // 使用 state 存储粒子位置，只在客户端生成一次（避免 SSR/CSR 不一致）
+  const [particles, setParticles] = useState<Array<{
+    id: number
+    left: number
+    top: number
+    duration: number
+    delay: number
+  }>>([])
+
+  // 仅在客户端生成粒子位置
+  useEffect(() => {
+    setParticles(generateParticles())
+  }, [])
+
   return (
     <div className="relative w-full h-screen overflow-hidden bg-black">
       {/* Background Video */}
@@ -39,7 +64,7 @@ export default function IntroTitle({ onEnter }: IntroTitleProps) {
           </p>
         </motion.div>
 
-        {/* Main Title - 拾光纪 */}
+        {/* Main Title - 时光快递驿站 */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -47,10 +72,10 @@ export default function IntroTitle({ onEnter }: IntroTitleProps) {
           className="text-center mb-6"
         >
           <h1 className="text-8xl md:text-9xl lg:text-[12rem] font-light text-white tracking-[0.15em] relative">
-            拾光纪
+            时光快递驿站
             {/* Glow effect */}
             <span className="absolute inset-0 text-8xl md:text-9xl lg:text-[12rem] blur-2xl opacity-30 text-white">
-              拾光纪
+              时光快递驿站
             </span>
           </h1>
         </motion.div>
@@ -134,29 +159,31 @@ export default function IntroTitle({ onEnter }: IntroTitleProps) {
           </p>
         </motion.div>
 
-        {/* Floating Particles Effect */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-white/30 rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.3, 0.6, 0.3],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-                ease: 'easeInOut',
-              }}
-            />
-          ))}
-        </div>
+        {/* Floating Particles Effect - 仅在客户端渲染，避免 hydration mismatch */}
+        {particles.length > 0 && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {particles.map((particle) => (
+              <motion.div
+                key={particle.id}
+                className="absolute w-1 h-1 bg-white/30 rounded-full"
+                style={{
+                  left: `${particle.left}%`,
+                  top: `${particle.top}%`,
+                }}
+                animate={{
+                  y: [0, -30, 0],
+                  opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{
+                  duration: particle.duration,
+                  repeat: Infinity,
+                  delay: particle.delay,
+                  ease: 'easeInOut',
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

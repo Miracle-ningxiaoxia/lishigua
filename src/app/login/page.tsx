@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, Suspense } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useApp } from '@/components/providers/AppProvider';
 
 function LoginForm() {
   const [inviteCode, setInviteCode] = useState('');
@@ -13,6 +14,7 @@ function LoginForm() {
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { musicPlayerRef } = useApp();
 
   // 页面加载后自动聚焦输入框
   useEffect(() => {
@@ -37,7 +39,19 @@ function LoginForm() {
         return;
       }
 
-      // 登录成功，添加短暂延迟增加仪式感
+      // 登录成功，立即启动音乐（利用用户点击交互）
+      try {
+        if (musicPlayerRef?.current && !musicPlayerRef.current.isPlaying()) {
+          console.log('Login success - starting music with user interaction');
+          await musicPlayerRef.current.startMusic();
+          sessionStorage.setItem('hasAutoPlayedMusic', 'true');
+        }
+      } catch (musicError) {
+        console.log('Failed to start music:', musicError);
+        // 音乐启动失败不影响登录流程
+      }
+
+      // 添加短暂延迟增加仪式感
       await new Promise(resolve => setTimeout(resolve, 800));
       
       const callbackUrl = searchParams.get('callbackUrl') || '/';
@@ -94,7 +108,7 @@ function LoginForm() {
               The Portal
             </h1>
             <p className="text-gray-400 text-sm tracking-widest">
-              拾光纪 · 专属入口
+              时光快递驿站 · 专属入口
             </p>
           </motion.div>
 
@@ -184,7 +198,7 @@ function LoginForm() {
                       验证中...
                     </span>
                   ) : (
-                    '进入拾光纪'
+                    '进入时光快递驿站'
                   )}
                 </span>
                 

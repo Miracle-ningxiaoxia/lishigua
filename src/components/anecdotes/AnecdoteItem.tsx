@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import Image from 'next/image'
+import { LikeButton, CommentButton } from '@/components/social'
 
 export interface Anecdote {
   id: string
@@ -18,9 +19,10 @@ export interface Anecdote {
 interface AnecdoteItemProps {
   anecdote: Anecdote
   onClick?: () => void
+  onCommentClick?: () => void
 }
 
-export default function AnecdoteItem({ anecdote, onClick }: AnecdoteItemProps) {
+export default function AnecdoteItem({ anecdote, onClick, onCommentClick }: AnecdoteItemProps) {
   const [isHovered, setIsHovered] = useState(false)
 
   const handleParticipantClick = (e: React.MouseEvent, participant: string) => {
@@ -30,6 +32,11 @@ export default function AnecdoteItem({ anecdote, onClick }: AnecdoteItemProps) {
     if (crewSection) {
       crewSection.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
+  }
+
+  const handleCommentClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    onCommentClick?.()
   }
 
   return (
@@ -148,9 +155,9 @@ export default function AnecdoteItem({ anecdote, onClick }: AnecdoteItemProps) {
           </motion.div>
         </div>
 
-        {/* Caption (Bottom) */}
+        {/* Caption and Actions (Bottom) */}
         <motion.div
-          className="backdrop-blur-xl bg-black/40 rounded-2xl p-3 md:p-4"
+          className="backdrop-blur-xl bg-black/40 rounded-2xl p-3 md:p-4 space-y-3"
           animate={{
             y: isHovered ? 0 : 10,
             opacity: isHovered ? 1 : 0.8,
@@ -160,6 +167,23 @@ export default function AnecdoteItem({ anecdote, onClick }: AnecdoteItemProps) {
           <p className="font-hand text-sm md:text-base text-white/90">
             {anecdote.caption}
           </p>
+          
+          {/* Social Actions */}
+          <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+            <LikeButton 
+              targetId={anecdote.id}
+              targetType="anecdote"
+              size="sm"
+              showCount={true}
+            />
+            
+            <CommentButton
+              moduleId={`anecdote-${anecdote.id}`}
+              onClick={handleCommentClick}
+              size="sm"
+              showCount={true}
+            />
+          </div>
         </motion.div>
       </div>
     </motion.div>
